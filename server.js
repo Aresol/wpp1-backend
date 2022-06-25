@@ -2,6 +2,7 @@ require('dotenv').config() // Allow the app to use environmental variables
 
 const express = require('express') // Add the express package that was installed
 const workoutRoutes = require('./routes/workouts')
+const mongoose = require('mongoose')
 
 // create the express app and load into a variable
 const app = express()
@@ -16,7 +17,15 @@ app.use((req, res, next)=> {
 // Connect all routes to the app
 app.use('/api/workouts', workoutRoutes) // Append the api/workouts to the beginning of all requests
 
-// listen to requests on a port number
-app.listen(process.env.PORT, () => {
-    console.log('Listening on port', process.env.PORT)
-})
+// Connect to db
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => { //Function for successful Mongo connection
+        // listen to requests on a port number after database connection occurs
+        app.listen(process.env.PORT, () => {
+        console.log('Connected to DB and Listening on port', process.env.PORT)
+        })
+    }) 
+    .catch((error) => {
+        console.log(error)
+    })
+
